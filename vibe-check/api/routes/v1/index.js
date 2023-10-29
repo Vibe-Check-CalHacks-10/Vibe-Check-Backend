@@ -20,4 +20,7 @@ router.get('/public', controller.public);
 
 router.post('/objects', validator.validate("post", "/objects"), controller.post);
 
+router.post('/vibe', controller.vibe);
+router.get('/vibe', controller.getVibe);
+
 module.exports = router;
