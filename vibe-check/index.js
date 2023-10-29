@@ -7,6 +7,9 @@ const socketio = require("socket.io");
 const { port } = require('./config/vars');
 const mongoose = require('mongoose'); 
 const Model = require('./models/userModel');
+const getLastDataPoint = (sec) => {
+	return Math.floor( sec / 5 ) * 5;
+}
 
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
 
@@ -16,6 +19,62 @@ io = socketio(server);
 server.listen(PORT, () => {
   console.log(`server running at port ${PORT}`);
 });
+
+io.on("connection", (socket) => {
+	const instance = new Model({ 
+		id: 0,
+		name: 'dummy',
+		timestamps: [],
+	});
+	socket.on("join", ({ id, name }, callback) => {
+    if (error) {
+      callback(error);
+    } else {
+			instance.id = id;
+			instance.name = name;
+		}
+	});
+	socket.on("log", ({ time, engagement }, callback) => {
+    if (error) {
+      callback(error);
+    } else {
+			instance.timestamps.push({ time, engagement });
+		}
+  });
+	socket.on("get-average", async (callback) => {
+		const instances = await Model.find({});
+		const engagementSum = new Map(); // key = sec, value = (totalEngagement, count)
+		instances.forEach((inst) => {
+			var currTime = 0;
+			const timestamps = inst.timestamps.sort();
+			timestamps.forEach(({ time, engagement }) => {
+				if (time > currTime) {
+					currTime = getLastDataPoint(time);
+					const value = engagementSum.get(currTime);
+					if (value == undefined) {
+						engagementSum.set(currTime, { totalEngagement, count: 1 });
+					} else {
+						var { totalEngagement, count } = value;
+						totalEngagement += engagement;
+						count++;
+						engagementSum.set(currTime, { totalEngagement, count });
+					}
+					currTime += 5;
+				}
+			});
+		});
+		const engagementAverage = new Map();
+		for (const [key, value] of engagementSum) { 
+			var { totalEngagement, count } = value;
+			avgEngagement = totalEngagement / count;
+			engagementAverage.set(key, avgEngagement);
+		}
+		callback(engagementAverage);
+	});
+	socket.on("disconnect", () => {
+		instance.save();
+	});
+})
 
 // when user connect, connect to hume ai
 // when user emit photo, send photo to hume ai, retrieve the emotions,

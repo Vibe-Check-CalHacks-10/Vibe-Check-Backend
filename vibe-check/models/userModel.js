@@ -12,16 +12,16 @@ var dataSchema = new Schema({
 });
 
 const Model = mongoose.model('vibe-check-db', dataSchema);
-const instance = new Model({ 
-	id: 0,
-	name: 'dummy',
-	timestamps: [
-		{
-			time: 0,
-			engagement: 0.5
-		},
-	],
-});
-instance.save();
+// const instance = new Model({ 
+// 	id: 0,
+// 	name: 'dummy',
+// 	timestamps: [
+// 		{
+// 			time: 0,
+// 			engagement: 0.5
+// 		},
+// 	],
+// });
+// instance.save();
 
 module.exports = Model;
