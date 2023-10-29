@@ -22,4 +22,5 @@ module.exports = {
       TENTANT_ID: process.env.APP_ID_TENTANT_ID,
         CLIENT_ID: process.env.APP_ID_CLIENT_ID
   },
+  db_url: process.env.DB_URL,
     };

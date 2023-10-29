@@ -4,16 +4,16 @@
 const app = require('./config/express');
 const http = require("http");
 const socketio = require("socket.io");
-const { port } = require('./config/vars');
+const { db_url, port } = require('./config/vars');
 const mongoose = require('mongoose'); 
 const Model = require('./models/userModel');
 const getLastDataPoint = (sec) => {
 	return Math.floor( sec / 5 ) * 5;
 }
 
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
+mongoose.connect(db_url, { useNewUrlParser: true });
 
-const PORT = process.env.PORT || 5000;
+const PORT = port || 5000;
 const server = http.createServer(app);
 io = socketio(server);
 server.listen(PORT, () => {
@@ -42,6 +42,10 @@ io.on("connection", (socket) => {
 		}
   });
 	socket.on("get-average", async (callback) => {
+		if (error) {
+			callback(error);
+			return;
+		}
 		const instances = await Model.find({});
 		const engagementSum = new Map(); // key = sec, value = (totalEngagement, count)
 		instances.forEach((inst) => {
