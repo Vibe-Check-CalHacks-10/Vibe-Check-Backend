@@ -38,9 +38,11 @@ exports.vibe = (req, res) => {
 	const body = req.body;
 	if (body.id) instance.id = body.id;
 	if (body.name) instance.name = body.name;
-	for ({ time, engagement } in body.timestamps) {
-		instance.timestamps.push({ time, engagement });
+	for (const index in body.timestamps) {
+		const dict = body.timestamps[index];
+		instance.timestamps.push(dict);
   }
+	instance.save();
 	res.status(httpStatus.OK);
 	return res.status(httpStatus.CREATED).json({
 		status: 'ok'
