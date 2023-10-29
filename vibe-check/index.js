@@ -6,35 +6,9 @@ const http = require("http");
 const socketio = require("socket.io");
 const { port } = require('./config/vars');
 const mongoose = require('mongoose'); 
+const Model = require('./models/userModel');
 
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true }, function (err) { 
-	if (err) throw err; 
-	console.log('Successfully connected'); 
-});
-
-var dataSchema = new Schema({
-	id: Number,
-	name: { type: String, default: 'anonymous' },
-	timestamps: [{
-		time: Number,
-		engagement: Number,
-	}],
-}, {
-	collection: 'vibe-check-collection-test'
-});
-
-const Model = mongoose.model('Test', dataSchema);
-const instance = new Model({ 
-	id: 0,
-	name: 'dummy',
-	timestamps: [
-		{
-			time: 0,
-			engagement: 0.5
-		},
-	],
-});
-await instance.save();
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true });
 
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
