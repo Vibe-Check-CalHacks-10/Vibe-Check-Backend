@@ -80,14 +80,17 @@ exports.getVibe = async (req, res) => {
 		});
 	});
 	// console.log(engagementSum);
-	const engagementAverage = {};
+	const timestamps = [];
 	for (const [key, value] of engagementSum) {
 		var { totalEngagement, count } = value;
 		avgEngagement = totalEngagement / count;
-		engagementAverage[key] =  avgEngagement;
+		timestamps.push({ 
+			time: key,
+			engagement: avgEngagement,
+		});
 	}
-	console.log(engagementAverage);
+	// console.log(timestamps);
 	return res.json({
-		engagementAverage
+		timestamps
 	})
 }
